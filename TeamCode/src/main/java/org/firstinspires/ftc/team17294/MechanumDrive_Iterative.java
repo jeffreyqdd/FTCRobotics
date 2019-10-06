@@ -1,7 +1,6 @@
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.team17294;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -32,11 +31,9 @@ import java.util.Arrays; //for debugging.
  */
 
 
-@TeleOp(name="Mechanum", group="Iterative Opmode")
-@Disabled
-
-
-public class OmniWheels_Iterative extends OpMode
+@TeleOp(name="Mecanum", group="Iterative Opmode")
+//@Disabled
+public class MechanumDrive_Iterative extends OpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -50,7 +47,7 @@ public class OmniWheels_Iterative extends OpMode
     private double driveLateral = 0;
     private double driveYaw = 0;
 
-    Mechanum model = null;
+    private Mecanum model = null;
 
 
 
@@ -60,25 +57,31 @@ public class OmniWheels_Iterative extends OpMode
 
 
         //init our class
-        model = new Mechanum(10,10);
+        model = new Mecanum(10,10);
+
 
         //four wheels.
-        leftDriveTop  = hardwareMap.get(DcMotor.class, "top left drive");
+        /*leftDriveTop  = hardwareMap.get(DcMotor.class, "top left drive");
         rightDriveTop = hardwareMap.get(DcMotor.class, "top right drive");
         rightDriveBot = hardwareMap.get(DcMotor.class, "bot right drive");
-        leftDriveBot  = hardwareMap.get(DcMotor.class, "bot left drive");
+        leftDriveBot  = hardwareMap.get(DcMotor.class, "bot left drive");*/
 
 
 
         //orientation
-        leftDriveBot.setDirection(DcMotor.Direction.FORWARD);
+        /*leftDriveBot.setDirection(DcMotor.Direction.FORWARD);
         leftDriveTop.setDirection(DcMotor.Direction.FORWARD);
         rightDriveBot.setDirection(DcMotor.Direction.REVERSE);
-        rightDriveTop.setDirection(DcMotor.Direction.REVERSE);
+        rightDriveTop.setDirection(DcMotor.Direction.REVERSE);*/
 
+        //stop any motion if any;
+        /*leftDriveTop.setPower(0.0);
+        rightDriveTop.setPower(0.0);
+        rightDriveBot.setPower(0.0);
+        leftDriveBot.setPower(0.0);*/
 
         // Tell the driver that initialization is complete.
-        telemetry.addData("Status", "Initialized");
+        telemetry.addData("Status", "initialized");
     }
 
 
@@ -92,32 +95,50 @@ public class OmniWheels_Iterative extends OpMode
     public void loop() {
 
 
+        /*
+         * get gamepad inputs here and store it in driveYaw, driveAxial, and driveLat.
+         * exponential curve
 
-        //get gamepad inputs here and store it in driveYaw, driveAxial, and driveLat.
-        //exponential curve.
-        driveAxial = Math.pow(-gamepad1.left_stick_y, 3);
-        driveLateral = Math.pow(gamepad1.left_stick_x, 3) + (-gamepad1.left_trigger + gamepad1.right_trigger);
+         * left stick has exponential curve.
+         * right stick exponential curve as well
+         * triggers have linear relationships at half power
+         * all powers are capped at 1;
+        */
+
+        driveAxial = Math.pow(-gamepad1.left_stick_y, 3); //need to invert
+
+        driveLateral = Math.pow(gamepad1.left_stick_x, 3)
+                + (-gamepad1.left_trigger*0.5 + gamepad1.right_trigger*0.5);
+
         driveYaw = Math.pow(gamepad1.right_stick_x,3);
 
+
+
         //clip the outputs
-        driveAxial = Range.clip(driveAxial, -1, 1);
-        driveLateral = Range.clip(driveLateral, -1, 1);
-        driveYaw = Range.clip(driveYaw, -1 ,1);
+        //driveAxial = Range.clip(driveAxial, -1, 1);
+        //driveLateral = Range.clip(driveLateral, -1, 1);
+        //driveYaw = Range.clip(driveYaw, -1 ,1);
 
 
 
         double[] driveVector = model.tick(driveYaw, driveAxial, driveLateral);
 
 
-        leftDriveTop.setPower(driveVector[0]);
+       /* leftDriveTop.setPower(driveVector[0]);
         rightDriveTop.setPower(driveVector[1]);
         rightDriveBot.setPower(driveVector[2]);
-        leftDriveBot.setPower(driveVector[3]);
+        leftDriveBot.setPower(driveVector[3]);*/
 
+        double[] temporary = {driveYaw,  driveAxial, driveLateral};
 
+        for(int i = 0; i < driveVector.length; i++)
+        {
+            driveVector[i] = (double) Math.round(driveVector[i] * 1000) / 1000.0;
+        }
         telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.addData("Wheel Debug", Arrays.toString(driveVector));
+        telemetry.addData("Controller Debug", Arrays.toString(temporary));
     }
-
 
     //Code to run ONCE after the driver hits STOP
 

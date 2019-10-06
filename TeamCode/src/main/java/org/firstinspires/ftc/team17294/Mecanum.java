@@ -1,25 +1,25 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.team17294;
 
-class Mechanum {
+class Mecanum {
 
     private double[][] MODEL = {
-            {-1.0, 1.0, 1.0},
+            {1.0, 1.0, 1.0},
             {-1.0, 1.0, -1.0},
             {-1.0, 1.0, 1.0},
-            {-1.0, 1.0, -1.0}
+            {1.0, 1.0, -1.0}
     };
 
     private double[] VECTOR;
 
 
-    Mechanum(double length, double width)
+    Mecanum(double length, double width)
     {
         VECTOR = new double[4];
 
-        MODEL[0][0] = -length - width;
+        /*MODEL[0][0] = -length - width;
         MODEL[1][0] = length + width;
         MODEL[2][0] = length + width;
-        MODEL[3][0] = -length - width;
+        MODEL[3][0] = -length - width;*/
 
 
     }
@@ -36,8 +36,8 @@ class Mechanum {
         for(int k = 0, curr = 2; k < 4; k++) VECTOR[k] += movement[curr] * MODEL[k][curr];
 
         //normalize
-        double max = 0;
-        for(double d : VECTOR) max = Math.max(max, d);
+        double max = 1;
+        for(double d : VECTOR) max = Math.max(max, Math.abs(d));
         for(int i = 0; i < 4; i++) VECTOR[i] /= max;
 
         return VECTOR;
