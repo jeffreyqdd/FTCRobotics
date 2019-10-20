@@ -103,7 +103,7 @@ public class MechanumDrive_Iterative extends OpMode
          * right stick exponential curve as well
          * triggers have linear relationships at half power
          * all powers are capped at 1;
-        */
+         */
 
         driveAxial = Math.pow(-gamepad1.left_stick_y, 3); //need to invert
 
