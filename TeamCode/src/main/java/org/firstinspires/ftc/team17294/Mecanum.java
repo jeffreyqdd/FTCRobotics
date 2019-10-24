@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.team17294;
 
-class Mecanum {
+public class Mecanum {
 
     private double[][] MODEL = {
             {1.0, 1.0, 1.0},
@@ -12,18 +12,25 @@ class Mecanum {
     private double[] VECTOR;
 
 
-    Mecanum(double length, double width)
+    Mecanum()
     {
         VECTOR = new double[4];
 
-        /*MODEL[0][0] = -length - width;
-        MODEL[1][0] = length + width;
-        MODEL[2][0] = length + width;
-        MODEL[3][0] = -length - width;*/
+        MODEL[0][0] = -Global.LENGTH - Global.WIDTH;
+        MODEL[1][0] = Global.LENGTH + Global.WIDTH;
+        MODEL[2][0] = Global.LENGTH + Global.WIDTH;
+        MODEL[3][0] = -Global.LENGTH - Global.WIDTH;
 
 
     }
 
+    /***
+     * double[] tick (double wx, double by, double bx)
+     * Set speed levels to motors based on axes requests
+     * @param wx   yaw
+     * @param by   axial
+     * @param bx   lateral
+     */
     double[] tick(double wx, double by, double bx)
     {
         double[] movement = {wx, by, bx};
@@ -37,6 +44,7 @@ class Mecanum {
 
         //normalize
         double max = 1;
+
         for(double d : VECTOR) max = Math.max(max, Math.abs(d));
         for(int i = 0; i < 4; i++) VECTOR[i] /= max;
 
