@@ -29,10 +29,11 @@ public class Robot_Navigation {
 
     VuforiaLocalizer vuforiaLocalizer;
     VuforiaLocalizer.Parameters parameters;
-    VuforiaTrackables visionTargets;
-    VuforiaTrackable target;
+
     VuforiaTrackableDefaultListener listener;
 
+
+    List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
     OpenGLMatrix lastKnownLocation;
     OpenGLMatrix phoneLocation;
 
@@ -45,16 +46,22 @@ public class Robot_Navigation {
 
     public void targetsAreVisible() throws InterruptedException
     {
-        OpenGLMatrix latestLocation = listener.getUpdatedRobotLocation();
 
-        if(latestLocation != null)
-        {
-            lastKnownLocation = latestLocation;
+        for(VuforiaTrackable trackable : allTrackables) {
+            //first get listener and cast it to vuforia trackable default listener
+
+            listener = (VuforiaTrackableDefaultListener) trackable.getListener();
+
+            OpenGLMatrix latestLocation = listener.getUpdatedRobotLocation();
+
+            if (latestLocation != null) {
+                lastKnownLocation = latestLocation;
+            }
+
+            myOpMode.telemetry.addData("Target: " + trackable.getName(), listener.isVisible());
+
         }
-
-        myOpMode.telemetry.addData("Tracking: " + target.getName(), listener.isVisible());
         myOpMode.telemetry.addData("Last known location: ", formatMatrix(lastKnownLocation));
-
     }
 
 
@@ -65,34 +72,48 @@ public class Robot_Navigation {
         myOpMode = opMode;
         //myRobot = robot;
 
+
+        /*
+         * create new a new vuforia localizer with these parameters
+         */
         parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        parameters.useExtendedTracking = false;
+
         vuforiaLocalizer = ClassFactory.getInstance().createVuforia(parameters);
 
-        visionTargets = vuforiaLocalizer.loadTrackablesFromAsset("FTC_2019-20");
+        /*
+         * Load data from the xml files
+         */
+        VuforiaTrackables visionTargets = this.vuforiaLocalizer.loadTrackablesFromAsset("FTC_2019-20");
 
-        target = visionTargets.get(0);
-        target.setName("twoBots");
-        target.setLocation(createMatrix(0,0,0,0,0,0));
+        VuforiaTrackable t1 = visionTargets.get(0);
+        t1.setName("two_bots");
+        t1.setLocation(createMatrix(0,0,0,0,0,0));
 
-        /*target = visionTargets.get(1);
-        target.setName("robotAssemble");
-        target.setLocation(createMatrix(0,0,0,0,0,0));
+        VuforiaTrackable t2 = visionTargets.get(1);
+        t2.setName("robot_assemble");
+        t2.setLocation(createMatrix(0,0,0,0,0,0));
 
-        target = visionTargets.get(2);
-        target.setName("blueHelper");
-        target.setLocation(createMatrix(0,0,0,0,0,0));
+        VuforiaTrackable t3 = visionTargets.get(2);
+        t3.setName("blue_helper");
+        t3.setLocation(createMatrix(0,0,0,0,0,0));
 
-        target = visionTargets.get(3);
-        target.setName("bb8Cooking");
-        target.setLocation(createMatrix(0,0,0,0,0,0));*/
+        VuforiaTrackable t4 = visionTargets.get(3);
+        t4.setName("bb8_cooking");
+        t4.setLocation(createMatrix(0,0,0,0,0,0));
 
+        allTrackables.addAll(visionTargets);
+
+        //create phone location
         phoneLocation = createMatrix(0,0,0,0,0,0);
 
-        listener = (VuforiaTrackableDefaultListener) target.getListener();
-        listener.setPhoneInformation(phoneLocation,parameters.cameraDirection);
-
+        //init all listeners.
+        ((VuforiaTrackableDefaultListener) t1.getListener()).setPhoneInformation(phoneLocation,parameters.cameraDirection);;
+        ((VuforiaTrackableDefaultListener) t2.getListener()).setPhoneInformation(phoneLocation,parameters.cameraDirection);;
+        ((VuforiaTrackableDefaultListener) t3.getListener()).setPhoneInformation(phoneLocation,parameters.cameraDirection);;
+        ((VuforiaTrackableDefaultListener) t4.getListener()).setPhoneInformation(phoneLocation,parameters.cameraDirection);;
 
         //do setup
         lastKnownLocation = createMatrix(0,0,0,0,0,0);
@@ -110,6 +131,6 @@ public class Robot_Navigation {
     {
         return matrix.formatAsTransform();
     }
-
+ 
 }
 
