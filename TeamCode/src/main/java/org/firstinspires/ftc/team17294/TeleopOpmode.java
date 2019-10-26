@@ -37,7 +37,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 
-@TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
+@TeleOp(name="Vuforia test op mode", group="Linear Opmode")
 //@Disabled
 public class TeleopOpmode extends LinearOpMode {
 
@@ -45,7 +45,7 @@ public class TeleopOpmode extends LinearOpMode {
     Robot_Navigation nav = new Robot_Navigation();
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
 
         //init bot and nav
 
@@ -55,6 +55,7 @@ public class TeleopOpmode extends LinearOpMode {
 
 
         waitForStart();
+        nav.start();
 
         while(true) {
             //robot.manualDrive();
@@ -65,5 +66,7 @@ public class TeleopOpmode extends LinearOpMode {
         }
 
     }
+
+
 
 }

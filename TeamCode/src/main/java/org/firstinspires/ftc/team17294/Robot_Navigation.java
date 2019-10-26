@@ -2,6 +2,8 @@ package org.firstinspires.ftc.team17294;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.robot.Robot;
+import com.vuforia.HINT;
+import com.vuforia.Vuforia;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -28,12 +30,9 @@ import static android.view.View.X;
 public class Robot_Navigation {
 
     VuforiaLocalizer vuforiaLocalizer;
-    VuforiaLocalizer.Parameters parameters;
-
     VuforiaTrackableDefaultListener listener;
+    VuforiaTrackables visionTargets;
 
-
-    List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
     OpenGLMatrix lastKnownLocation;
     OpenGLMatrix phoneLocation;
 
@@ -44,10 +43,10 @@ public class Robot_Navigation {
 
     Robot_Navigation() {} //default constructor
 
-    public void targetsAreVisible() throws InterruptedException
+    public void targetsAreVisible()
     {
 
-        for(VuforiaTrackable trackable : allTrackables) {
+        for(VuforiaTrackable trackable : visionTargets) {
             //first get listener and cast it to vuforia trackable default listener
 
             listener = (VuforiaTrackableDefaultListener) trackable.getListener();
@@ -65,6 +64,10 @@ public class Robot_Navigation {
     }
 
 
+    public void start()
+    {
+        visionTargets.activate();
+    }
 
     public void initVuforia(LinearOpMode opMode/*, Robot_MecanumDrive robot*/) {
 
@@ -76,48 +79,59 @@ public class Robot_Navigation {
         /*
          * create new a new vuforia localizer with these parameters
          */
-        parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
+        Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 8);
+
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
         parameters.useExtendedTracking = false;
+        parameters.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES;
 
+        //set a hint
+
+
+        //create the localizer
         vuforiaLocalizer = ClassFactory.getInstance().createVuforia(parameters);
+
 
         /*
          * Load data from the xml files
          */
-        VuforiaTrackables visionTargets = this.vuforiaLocalizer.loadTrackablesFromAsset("FTC_2019-20");
 
-        VuforiaTrackable t1 = visionTargets.get(0);
-        t1.setName("two_bots");
-        t1.setLocation(createMatrix(0,0,0,0,0,0));
+        visionTargets = this.vuforiaLocalizer.loadTrackablesFromAsset("Skystone");
 
-        VuforiaTrackable t2 = visionTargets.get(1);
-        t2.setName("robot_assemble");
-        t2.setLocation(createMatrix(0,0,0,0,0,0));
+        visionTargets.get(5).setName("cpo");
+        visionTargets.get(5).setLocation(createMatrix(0,0,0,0,0,0));
 
-        VuforiaTrackable t3 = visionTargets.get(2);
-        t3.setName("blue_helper");
-        t3.setLocation(createMatrix(0,0,0,0,0,0));
+        visionTargets.get(6).setName("yellow thing");
+        visionTargets.get(6).setLocation(createMatrix(0,0,0,0,0,0));
 
-        VuforiaTrackable t4 = visionTargets.get(3);
-        t4.setName("bb8_cooking");
-        t4.setLocation(createMatrix(0,0,0,0,0,0));
+        visionTargets.get(7).setName("blue thing");
+        visionTargets.get(7).setLocation(createMatrix(0,0,0,0,0,0));
 
-        allTrackables.addAll(visionTargets);
+        visionTargets.get(8).setName("r2d2 and bb8");
+        visionTargets.get(8).setLocation(createMatrix(0,0,0,0,0,0));
+
+        visionTargets.get(9).setName("bb8");
+        visionTargets.get(9).setLocation(createMatrix(0,0,0,0,0,0));
+
+        visionTargets.get(10).setName("salute");
+        visionTargets.get(10).setLocation(createMatrix(0,0,0,0,0,0));
+
+        visionTargets.get(11).setName("dj");
+        visionTargets.get(11).setLocation(createMatrix(0,0,0,0,0,0));
+
+        visionTargets.get(12).setName("new r2d2");
+        visionTargets.get(12).setLocation(createMatrix(0,0,0,0,0,0));
+
+
 
         //create phone location
         phoneLocation = createMatrix(0,0,0,0,0,0);
 
-        //init all listeners.
-        ((VuforiaTrackableDefaultListener) t1.getListener()).setPhoneInformation(phoneLocation,parameters.cameraDirection);;
-        ((VuforiaTrackableDefaultListener) t2.getListener()).setPhoneInformation(phoneLocation,parameters.cameraDirection);;
-        ((VuforiaTrackableDefaultListener) t3.getListener()).setPhoneInformation(phoneLocation,parameters.cameraDirection);;
-        ((VuforiaTrackableDefaultListener) t4.getListener()).setPhoneInformation(phoneLocation,parameters.cameraDirection);;
 
         //do setup
         lastKnownLocation = createMatrix(0,0,0,0,0,0);
-        visionTargets.activate();
 
     }
 
@@ -131,6 +145,6 @@ public class Robot_Navigation {
     {
         return matrix.formatAsTransform();
     }
- 
+
 }
 
