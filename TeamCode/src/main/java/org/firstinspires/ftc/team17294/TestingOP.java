@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -55,7 +56,8 @@ public class TestingOP extends LinearOpMode {
     @Override
     public void runOpMode() {
         //init
-        setUp("motor1", "motor2", "motor3", "motor4");
+        setUp(Global.LEFT_TOP_MOTOR, Global.RIGHT_TOP_MOTOR,
+                Global.RIGHT_BOT_MOTOR, Global.LEFT_BOT_MOTOR);
 
         // Wait for the game to start
         waitForStart();
@@ -69,7 +71,7 @@ public class TestingOP extends LinearOpMode {
 
             //get inputs
             if(gamepad1.right_bumper) speedToggle = 0.75;
-            if(gamepad1.left_bumper) speedToggle = 0.75;
+            if(gamepad1.left_bumper) speedToggle = -0.75;
 
             if(gamepad1.y) toggle1 = !toggle1;
             if(gamepad1.b) toggle2 = !toggle2;
@@ -129,6 +131,8 @@ public class TestingOP extends LinearOpMode {
 
         motor1.setDirection(DcMotor.Direction.FORWARD);
         motor2.setDirection(DcMotor.Direction.REVERSE);
+        motor3.setDirection(DcMotor.Direction.REVERSE);
+        motor4.setDirection(DcMotor.Direction.FORWARD);
 
         motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

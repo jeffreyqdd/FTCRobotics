@@ -41,7 +41,7 @@ import com.qualcomm.robotcore.util.Range;
 //@Disabled
 public class TeleopOpmode extends LinearOpMode {
 
-    //Robot_MecanumDrive robot = new Robot_MecanumDrive();
+    Robot_MecanumDrive robot = new Robot_MecanumDrive();
     Robot_Navigation nav = new Robot_Navigation();
 
     @Override
@@ -49,23 +49,25 @@ public class TeleopOpmode extends LinearOpMode {
 
         //init bot and nav
 
-        //robot.init(this);
-        //nav.initVuforia(this, robot);
-        nav.initVuforia(this);
+        robot.init(this);
+        //nav.initVuforia(this/*, robot*/);
+        //nav.initVuforia(this);
 
 
         waitForStart();
-        nav.start();
+        //nav.start();
 
         while(true) {
-            //robot.manualDrive();
-            //robot.moveRobot();
-            nav.targetsAreVisible();
+            robot.manualDrive();
+            robot.moveRobot();
+            //nav.targetsAreVisible();
 
             telemetry.update();
         }
 
     }
+
+
 
 
 
