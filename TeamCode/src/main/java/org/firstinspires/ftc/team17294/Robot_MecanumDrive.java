@@ -5,33 +5,47 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-
+import com.gogobot.botcore.kinematic.*;
+import java.util.List;
 
 class Robot_MecanumDrive {
 
-    private LinearOpMode myOpMode;
+    private LinearOpMode myOpMode = null;
+    private FourMecanumKinematic kinematic = null;
+
 
     private DcMotor leftTopDrive = null;
     private DcMotor rightTopDrive= null;
     private DcMotor leftBotDrive = null;
     private DcMotor rightBotDrive = null;
 
+    /* store these as meters per second*/
     private double driveAxial = 0;
     private double driveLateral = 0;
     private double driveYaw = 0;
 
-    private Mecanum robot = null;
-
     public Robot_MecanumDrive() {} //default constructor
 
+
+    /***
+     * void init(LinearOpMode opMode)
+     * initializes all the members and data needed to operate the motors
+     * @param opMode stores a copy of the current opMode to access members ex: game pad
+     */
     public void init(LinearOpMode opMode)
     {
         //save reference to Hardware map
         myOpMode = opMode;
 
+        //config mecanum wheel drive
+        FourMecanumKinematicConfiguration config = new FourMecanumKinematicConfiguration();
+        config.wheelRadius = Global.WHEEL_DIAM / 2.0;
+        config.lengthBetweenFrontAndRearWheels = Global.DIST_BETWEEN_FRONT_AND_REAR;
+        config.lengthBetweenFrontWheels = Global.DIST_BETWEEN_FRONT_AND_FRONT;
+        kinematic = new FourMecanumKinematic(config);
 
-        //init robot
-        robot = new Mecanum();
+        //Controller deadzone
+        myOpMode.gamepad1.setJoystickDeadzone(0.001f);
 
         //define and init motors
         //with encoders since they are installed.
@@ -41,51 +55,52 @@ class Robot_MecanumDrive {
         leftBotDrive = myOpMode.hardwareMap.get(DcMotor.class, Global.LEFT_BOT_MOTOR);
         rightBotDrive = myOpMode.hardwareMap.get(DcMotor.class, Global.RIGHT_BOT_MOTOR);
 
-        leftTopDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBotDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightTopDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightBotDrive.setDirection(DcMotor.Direction.REVERSE);
-
+        //of course we will be using encoders
         leftTopDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightTopDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBotDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBotDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        //setting direction of the motors
+        leftTopDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBotDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightTopDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightBotDrive.setDirection(DcMotor.Direction.FORWARD);
+
+
+
 
         //stop all motion.
-
-
         moveRobot(0,0,0) ;
     }
 
-    public void manualDrive()  {
-        double dAxial = Math.pow(-myOpMode.gamepad1.left_stick_y, 3); //need to invert
+    public void doControllerTick()  {
+        //get controller input
+        //left stick represents the 2 degrees of freedom (x and y velocities)
+        //right stick controls turning
+        //triggers are scaled down for fine movements
+        //sticks are linear curved while the sticks are exponential
 
-        double dLateral = Math.pow(myOpMode.gamepad1.left_stick_x, 3)
-                + (-myOpMode.gamepad1.left_trigger*0.5 + myOpMode.gamepad1.right_trigger*0.5);
+        double controllerAxial = Math.pow(-myOpMode.gamepad1.left_stick_y, 3);
+        double controllerLateral = Math.pow(myOpMode.gamepad1.left_stick_x
+                                         + (myOpMode.gamepad1.left_trigger * -0.3)
+                                         + (myOpMode.gamepad1.right_trigger * 0.3)
+                                         , 3);
+        double controllerYaw = Math.pow(myOpMode.gamepad1.right_stick_x,3);
 
-        double dYaw = Math.pow(myOpMode.gamepad1.right_stick_x,3);
+        /*should be in m/s*/
+        controllerAxial = Range.clip(controllerAxial, -1, 1) * Global.MAX_SPEED;
+        controllerLateral = Range.clip(controllerLateral, -1, 1) * Global.MAX_SPEED;
+        controllerYaw = Range.clip(controllerYaw, -1, 1) * Global.MAX_SPEED;
 
-        setAxial(dAxial);
-        setLateral(dLateral);
-        setYaw(dYaw);
+        setAxial(controllerAxial); //m/s
+        setLateral(controllerLateral); //m/s
+        setYaw(controllerYaw); //m/s
+
+
     }
 
-    /***
-     * void moveRobot(double axial, double lateral, double yaw)
-     * Set speed levels to motors based on axes requests
-     * @param axial     Speed in Fwd Direction
-     * @param lateral   Speed in lateral direction (+ve to right)
-     * @param yaw       Speed of Yaw rotation.  (+ve is CCW)
-     */
 
-
-    public void moveRobot(double axial, double lateral, double yaw) {
-        setAxial(axial);
-        setLateral(lateral);
-        setYaw(yaw);
-        moveRobot();
-    }
 
 
     /***
@@ -103,16 +118,60 @@ class Robot_MecanumDrive {
      */
 
     public void moveRobot() {
-        // calculate required motor speeds to achieve axis motions
-        double[] vector = robot.tick(driveYaw, driveAxial, driveLateral);
+        List<Double> trajectory = kinematic.cartesianVelocityToWheelVelocities(
+            new CartesianVelocity(driveAxial, driveLateral, driveYaw)
+        );
 
-        // Set drive motor power levels.
-        leftTopDrive.setPower(vector[0]);
-        leftBotDrive.setPower(vector[1]);
-        rightTopDrive.setPower(vector[2]);
-        rightBotDrive.setPower(vector[3]);
+        //set power
+        leftTopDrive.setPower(Global.angularSpeedToMotorPower(trajectory.get(0)));
+        rightTopDrive.setPower(Global.angularSpeedToMotorPower(trajectory.get(1)));
+        rightBotDrive.setPower(Global.angularSpeedToMotorPower(trajectory.get(2)));
+        leftBotDrive.setPower(Global.angularSpeedToMotorPower(trajectory.get(3)));
 
 
+        //telemetry
+        myOpMode.telemetry.addData("Inputs",
+                "Axial: (%.2f), Lateral: (%.2f), Yaw: (%.2f)",
+                driveAxial,
+                driveLateral,
+                driveYaw);
+
+        myOpMode.telemetry.addData("pre processed Motors",
+                "m1: (%.2f), m2: (%.2f), m3: (%.2f),  m4: (%.2f)",
+                trajectory.get(0),
+                trajectory.get(1),
+                trajectory.get(2),
+                trajectory.get(3));
+
+        myOpMode.telemetry.addData("Motors",
+                "m1: (%.2f), m2: (%.2f), m3: (%.2f),  m4: (%.2f)",
+                Global.angularSpeedToMotorPower(trajectory.get(0)),
+                Global.angularSpeedToMotorPower(trajectory.get(1)),
+                Global.angularSpeedToMotorPower(trajectory.get(2)),
+                Global.angularSpeedToMotorPower(trajectory.get(3)));
+
+
+        myOpMode.telemetry.addData("Encoder Values",
+                "m1, m2, m3, m4",
+                leftTopDrive.getCurrentPosition(),
+                rightTopDrive.getCurrentPosition(),
+                rightBotDrive.getCurrentPosition(),
+                leftBotDrive.getCurrentPosition());
+
+    }// beautiful
+
+    /***
+     * void moveRobot(double axial, double lateral, double yaw)
+     * Set speed levels to motors based on axes requests
+     * @param axial     Speed in Fwd Direction
+     * @param lateral   Speed in lateral direction (+ve to right)
+     * @param yaw       Speed of Yaw rotation.  (+ve is CCW)
+     */
+    public void moveRobot(double axial, double lateral, double yaw) {
+        setAxial(axial);
+        setLateral(lateral);
+        setYaw(yaw);
+        moveRobot();
     }
 
 

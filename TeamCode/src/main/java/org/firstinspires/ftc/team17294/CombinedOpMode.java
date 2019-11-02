@@ -39,33 +39,38 @@ import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="Vuforia test op mode", group="Linear Opmode")
 //@Disabled
-public class TeleopOpmode extends LinearOpMode {
+public class CombinedOpMode extends LinearOpMode {
 
     Robot_MecanumDrive robot = new Robot_MecanumDrive();
     Robot_Navigation nav = new Robot_Navigation();
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException{
 
         //init bot and nav
 
         robot.init(this);
-        //nav.initVuforia(this/*, robot*/);
-        //nav.initVuforia(this);
+        nav.initVuforia(this);
 
 
         waitForStart();
-        //nav.start();
 
-        while(true) {
-            robot.manualDrive();
+        //start vuforia.
+        nav.start();
+        while(opModeIsActive()) {
+            robot.doControllerTick();
             robot.moveRobot();
-            //nav.targetsAreVisible();
 
+            nav.targetsAreVisible();
+
+            //since we init robot and nav to "this" opMode, we can
+            //addDate to telemetry within the class, and flush outside
+            //using update.
             telemetry.update();
         }
 
     }
+
 
 
 

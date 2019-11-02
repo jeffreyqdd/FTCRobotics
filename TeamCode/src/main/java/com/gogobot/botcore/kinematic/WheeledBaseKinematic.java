@@ -5,7 +5,7 @@ import java.util.List;
 public interface WheeledBaseKinematic {
 	/**
 	 * from vehicle base velocity to all individual wheels turning velocity
-	 * @param  Plane3DoFVelocity chassis velocity with longitudal, transversal and angular
+	 * @param  chassisVelocity chassis velocity with longitudal, transversal and angular
 	 * @return a collection of angular velocity for all wheels
 	 * 
  	 */

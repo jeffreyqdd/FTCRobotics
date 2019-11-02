@@ -54,7 +54,7 @@ public class TestingOP extends LinearOpMode {
     private double speedToggle = 0;
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException{
         //init
         setUp(Global.LEFT_TOP_MOTOR, Global.RIGHT_TOP_MOTOR,
                 Global.RIGHT_BOT_MOTOR, Global.LEFT_BOT_MOTOR);
@@ -66,7 +66,7 @@ public class TestingOP extends LinearOpMode {
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
-        while(true)
+        while(opModeIsActive())
         {
 
             //get inputs
@@ -109,8 +109,9 @@ public class TestingOP extends LinearOpMode {
             if(toggle4) motor4.setPower(speedToggle);
             else motor4.setPower(speed);
 
-            //telemetry.addData("Status", "Run Time: " + runtime.toString());
-            //telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Motors", "toggle: (%.2f), controller: (%.2f)",
+                    speedToggle, speed);
             telemetry.update();
         }
 

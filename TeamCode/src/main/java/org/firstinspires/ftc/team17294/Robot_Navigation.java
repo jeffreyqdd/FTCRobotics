@@ -37,7 +37,6 @@ public class Robot_Navigation {
     OpenGLMatrix phoneLocation;
 
     LinearOpMode myOpMode;
-    Robot_MecanumDrive myRobot;
 
     public static final String VUFORIA_KEY = "AZklCzv/////AAABmTV7jhYz8E2ZgjSFt8rqQUB/fxREWQkyjBEmljutiXICdiA/5wnsf4evcLyh0+kwMHzC11Egu0y+UgK3OqS+BXkZV7eRxl00YNAaB0yp5SFR2+bV5u5DpK8Mu5EkqOnfxRjkNVFcm0NEp+UViCwedzadKLoxBz7kZpWgjNccdVt0rNdAnSAZ/7h0/OM+lig2PT2UVcSOGiG3bbWqL9CE7ffwIg/0Hbl5e4c77Ad4lVXh39EBw46AdFYLLIL/iDBi27olgVEvH4ORLHPsKsEay4rXFoEeXt31y9fTsDoha/yOSWZYK8ycrhPyyHMcS9tlgCo3zYaSzzEjI+EQrq75rnHVJTq3DEomwt30AhnQ6rSf";
 
@@ -69,31 +68,28 @@ public class Robot_Navigation {
         visionTargets.activate();
     }
 
-    public void initVuforia(LinearOpMode opMode/*, Robot_MecanumDrive robot*/) {
+    public void initVuforia(LinearOpMode opMode) {
 
         // Save reference to OpMode and Hardware map
         myOpMode = opMode;
-        //myRobot = robot;
-
 
         /*
          * create new a new vuforia localizer with these parameters
          */
-        Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 8);
+
 
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-        parameters.useExtendedTracking = false;
+        parameters.useExtendedTracking = true;
         parameters.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES;
-
         //set a hint
 
 
         //create the localizer
         vuforiaLocalizer = ClassFactory.getInstance().createVuforia(parameters);
 
-
+        Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 8);
         /*
          * Load data from the xml files
          */
