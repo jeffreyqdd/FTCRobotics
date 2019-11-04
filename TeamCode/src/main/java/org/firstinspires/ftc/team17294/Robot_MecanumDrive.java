@@ -3,6 +3,7 @@ package org.firstinspires.ftc.team17294;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.gogobot.botcore.kinematic.*;
@@ -14,26 +15,24 @@ class Robot_MecanumDrive {
     private FourMecanumKinematic kinematic = null;
 
 
-    private DcMotor leftTopDrive = null;
-    private DcMotor rightTopDrive= null;
-    private DcMotor leftBotDrive = null;
-    private DcMotor rightBotDrive = null;
+    private DcMotor leftTopDrive;
+    private DcMotor rightTopDrive;
+    private DcMotor rightBotDrive;
+    private DcMotor leftBotDrive;
 
     /* store these as meters per second*/
     private double driveAxial = 0;
     private double driveLateral = 0;
     private double driveYaw = 0;
 
-    public Robot_MecanumDrive() {} //default constructor
-
-
     /***
      * void init(LinearOpMode opMode)
      * initializes all the members and data needed to operate the motors
      * @param opMode stores a copy of the current opMode to access members ex: game pad
      */
-    public void init(LinearOpMode opMode)
+    public Robot_MecanumDrive(LinearOpMode opMode)
     {
+
         //save reference to Hardware map
         myOpMode = opMode;
 
@@ -47,28 +46,16 @@ class Robot_MecanumDrive {
         //Controller deadzone
         myOpMode.gamepad1.setJoystickDeadzone(0.001f);
 
-        //define and init motors
-        //with encoders since they are installed.
+        //set up motor
+        String[] motorNames = {Global.LEFT_TOP_MOTOR, Global.RIGHT_TOP_MOTOR,
+                Global.RIGHT_BOT_MOTOR, Global.LEFT_BOT_MOTOR};
+        DriverController dc = new DriverController(motorNames, myOpMode.hardwareMap);
 
-        leftTopDrive = myOpMode.hardwareMap.get(DcMotor.class, Global.LEFT_TOP_MOTOR);
-        rightTopDrive= myOpMode.hardwareMap.get(DcMotor.class, Global.RIGHT_TOP_MOTOR);
-        leftBotDrive = myOpMode.hardwareMap.get(DcMotor.class, Global.LEFT_BOT_MOTOR);
-        rightBotDrive = myOpMode.hardwareMap.get(DcMotor.class, Global.RIGHT_BOT_MOTOR);
-
-        //of course we will be using encoders
-        leftTopDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightTopDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBotDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBotDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        //setting direction of the motors
-        leftTopDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBotDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightTopDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightBotDrive.setDirection(DcMotor.Direction.FORWARD);
-
-
-
+        //copy data over
+        leftTopDrive = dc.leftTopDrive;
+        rightTopDrive = dc.rightTopDrive;
+        rightBotDrive = dc.rightBotDrive;
+        leftBotDrive = dc.leftBotDrive;
 
         //stop all motion.
         moveRobot(0,0,0) ;
@@ -81,12 +68,12 @@ class Robot_MecanumDrive {
         //triggers are scaled down for fine movements
         //sticks are linear curved while the sticks are exponential
 
-        double controllerAxial = Math.pow(-myOpMode.gamepad1.left_stick_y, 3);
-        double controllerLateral = Math.pow(myOpMode.gamepad1.left_stick_x
+        double controllerAxial = -myOpMode.gamepad1.left_stick_y;
+        double controllerLateral = myOpMode.gamepad1.left_stick_x
                                          + (myOpMode.gamepad1.left_trigger * -0.3)
-                                         + (myOpMode.gamepad1.right_trigger * 0.3)
-                                         , 3);
-        double controllerYaw = Math.pow(myOpMode.gamepad1.right_stick_x,3);
+                                         + (myOpMode.gamepad1.right_trigger * 0.3);
+
+        double controllerYaw = myOpMode.gamepad1.right_stick_x;
 
         /*should be in m/s*/
         controllerAxial = Range.clip(controllerAxial, -1, 1) * Global.MAX_SPEED;
@@ -152,11 +139,10 @@ class Robot_MecanumDrive {
 
 
         myOpMode.telemetry.addData("Encoder Values",
-                "m1, m2, m3, m4",
-                leftTopDrive.getCurrentPosition(),
-                rightTopDrive.getCurrentPosition(),
-                rightBotDrive.getCurrentPosition(),
-                leftBotDrive.getCurrentPosition());
+                "[" + leftTopDrive.getCurrentPosition() + "," +
+                rightTopDrive.getCurrentPosition() + "," +
+                rightBotDrive.getCurrentPosition() + "," +
+                leftBotDrive.getCurrentPosition() + "]");
 
     }// beautiful
 

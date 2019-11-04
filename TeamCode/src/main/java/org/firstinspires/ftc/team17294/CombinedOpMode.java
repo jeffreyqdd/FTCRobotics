@@ -41,16 +41,15 @@ import com.qualcomm.robotcore.util.Range;
 //@Disabled
 public class CombinedOpMode extends LinearOpMode {
 
-    Robot_MecanumDrive robot = new Robot_MecanumDrive();
-    Robot_Navigation nav = new Robot_Navigation();
+    Robot_MecanumDrive robot;
+    Robot_Navigation nav;
 
     @Override
     public void runOpMode() throws InterruptedException{
 
         //init bot and nav
-
-        robot.init(this);
-        nav.initVuforia(this);
+        robot = new Robot_MecanumDrive(this);
+        nav = new Robot_Navigation(this);
 
 
         waitForStart();

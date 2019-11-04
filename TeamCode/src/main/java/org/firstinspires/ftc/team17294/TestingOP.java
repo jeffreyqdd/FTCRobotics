@@ -29,13 +29,12 @@
 
 package org.firstinspires.ftc.team17294;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
+
+import java.sql.Driver;
 
 
 @TeleOp(name="Testing Op Mode", group="Linear Opmode")
@@ -44,10 +43,11 @@ public class TestingOP extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor motor1 = null;
-    private DcMotor motor2 = null;
-    private DcMotor motor3 = null;
-    private DcMotor motor4 = null;
+
+    private DcMotor leftTopDrive;
+    private DcMotor rightTopDrive;
+    private DcMotor rightBotDrive;
+    private DcMotor leftBotDrive;
 
     private boolean toggle1 = false, toggle2 = false, toggle3 = false, toggle4 = false;;
     private double speed = 0;
@@ -55,9 +55,17 @@ public class TestingOP extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException{
-        //init
-        setUp(Global.LEFT_TOP_MOTOR, Global.RIGHT_TOP_MOTOR,
-                Global.RIGHT_BOT_MOTOR, Global.LEFT_BOT_MOTOR);
+
+        String[] motorNames = {Global.LEFT_TOP_MOTOR, Global.RIGHT_TOP_MOTOR,
+                Global.RIGHT_BOT_MOTOR, Global.LEFT_BOT_MOTOR};
+
+        DriverController dc = new DriverController(motorNames, hardwareMap);
+
+        leftTopDrive = dc.leftTopDrive;
+        rightTopDrive = dc.rightTopDrive;
+        rightBotDrive = dc.rightBotDrive;
+        leftBotDrive = dc.leftBotDrive;
+
 
         // Wait for the game to start
         waitForStart();
@@ -97,17 +105,17 @@ public class TestingOP extends LinearOpMode {
 
             //set speeds
 
-            if(toggle1) motor1.setPower(speedToggle);
-            else motor1.setPower(speed);
+            if(toggle1) leftTopDrive.setPower(speedToggle);
+            else leftTopDrive.setPower(speed);
 
-            if(toggle2) motor2.setPower(speedToggle);
-            else motor2.setPower(speed);
+            if(toggle2) rightTopDrive.setPower(speedToggle);
+            else rightTopDrive.setPower(speed);
 
-            if(toggle3) motor3.setPower(speedToggle);
-            else motor3.setPower(speed);
+            if(toggle3) rightBotDrive.setPower(speedToggle);
+            else rightBotDrive.setPower(speed);
 
-            if(toggle4) motor4.setPower(speedToggle);
-            else motor4.setPower(speed);
+            if(toggle4) leftBotDrive.setPower(speedToggle);
+            else leftBotDrive.setPower(speed);
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", "toggle: (%.2f), controller: (%.2f)",
@@ -116,31 +124,5 @@ public class TestingOP extends LinearOpMode {
         }
 
     }
-
-
-    public void setUp(String m1,String m2, String m3, String m4)
-    {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-
-        // Initialize
-        motor1  = hardwareMap.get(DcMotor.class, m1);
-        motor2  = hardwareMap.get(DcMotor.class, m2);
-        motor3  = hardwareMap.get(DcMotor.class, m3);
-        motor4  = hardwareMap.get(DcMotor.class, m4);
-
-
-        motor1.setDirection(DcMotor.Direction.FORWARD);
-        motor2.setDirection(DcMotor.Direction.REVERSE);
-        motor3.setDirection(DcMotor.Direction.REVERSE);
-        motor4.setDirection(DcMotor.Direction.FORWARD);
-
-        motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor3.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor4.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-    }
-
 
 }

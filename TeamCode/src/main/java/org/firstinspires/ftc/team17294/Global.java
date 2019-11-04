@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.util.Range;
 public class Global {
     public static final String LEFT_TOP_MOTOR = "top left drive";
     public static final String RIGHT_TOP_MOTOR = "top right drive";
-    public static final String LEFT_BOT_MOTOR = "bot right drive";
-    public static final String RIGHT_BOT_MOTOR = "bot left drive";
+    public static final String RIGHT_BOT_MOTOR = "bot right drive";
+    public static final String LEFT_BOT_MOTOR = "bot left drive";
 
     public static final double DIST_BETWEEN_FRONT_AND_FRONT = 0.405; //m
     public static final double DIST_BETWEEN_FRONT_AND_REAR = 0.202; //m

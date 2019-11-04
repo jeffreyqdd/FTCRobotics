@@ -40,35 +40,8 @@ public class Robot_Navigation {
 
     public static final String VUFORIA_KEY = "AZklCzv/////AAABmTV7jhYz8E2ZgjSFt8rqQUB/fxREWQkyjBEmljutiXICdiA/5wnsf4evcLyh0+kwMHzC11Egu0y+UgK3OqS+BXkZV7eRxl00YNAaB0yp5SFR2+bV5u5DpK8Mu5EkqOnfxRjkNVFcm0NEp+UViCwedzadKLoxBz7kZpWgjNccdVt0rNdAnSAZ/7h0/OM+lig2PT2UVcSOGiG3bbWqL9CE7ffwIg/0Hbl5e4c77Ad4lVXh39EBw46AdFYLLIL/iDBi27olgVEvH4ORLHPsKsEay4rXFoEeXt31y9fTsDoha/yOSWZYK8ycrhPyyHMcS9tlgCo3zYaSzzEjI+EQrq75rnHVJTq3DEomwt30AhnQ6rSf";
 
-    Robot_Navigation() {} //default constructor
-
-    public void targetsAreVisible()
+    Robot_Navigation(LinearOpMode opMode)
     {
-
-        for(VuforiaTrackable trackable : visionTargets) {
-            //first get listener and cast it to vuforia trackable default listener
-
-            listener = (VuforiaTrackableDefaultListener) trackable.getListener();
-
-            OpenGLMatrix latestLocation = listener.getUpdatedRobotLocation();
-
-            if (latestLocation != null) {
-                lastKnownLocation = latestLocation;
-            }
-
-            myOpMode.telemetry.addData("Target: " + trackable.getName(), listener.isVisible());
-
-        }
-        myOpMode.telemetry.addData("Last known location: ", formatMatrix(lastKnownLocation));
-    }
-
-
-    public void start()
-    {
-        visionTargets.activate();
-    }
-
-    public void initVuforia(LinearOpMode opMode) {
 
         // Save reference to OpMode and Hardware map
         myOpMode = opMode;
@@ -81,7 +54,7 @@ public class Robot_Navigation {
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-        parameters.useExtendedTracking = true;
+        parameters.useExtendedTracking = false;
         parameters.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES;
         //set a hint
 
@@ -130,6 +103,33 @@ public class Robot_Navigation {
         lastKnownLocation = createMatrix(0,0,0,0,0,0);
 
     }
+
+    public void targetsAreVisible()
+    {
+
+        for(VuforiaTrackable trackable : visionTargets) {
+            //first get listener and cast it to vuforia trackable default listener
+
+            listener = (VuforiaTrackableDefaultListener) trackable.getListener();
+
+            OpenGLMatrix latestLocation = listener.getUpdatedRobotLocation();
+
+            if (latestLocation != null) {
+                lastKnownLocation = latestLocation;
+            }
+
+            myOpMode.telemetry.addData("Target: " + trackable.getName(), listener.isVisible());
+
+        }
+        myOpMode.telemetry.addData("Last known location: ", formatMatrix(lastKnownLocation));
+    }
+
+
+    public void start()
+    {
+        visionTargets.activate();
+    }
+
 
     public OpenGLMatrix createMatrix(float x, float y, float z, float u, float v, float w)
     {
