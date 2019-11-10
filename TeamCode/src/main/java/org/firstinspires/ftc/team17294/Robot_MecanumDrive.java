@@ -1,10 +1,7 @@
 package org.firstinspires.ftc.team17294;
 
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.gogobot.botcore.kinematic.*;
 import java.util.List;
@@ -14,7 +11,7 @@ class Robot_MecanumDrive {
     private LinearOpMode myOpMode = null;
     private FourMecanumKinematic kinematic = null;
 
-
+    //Dc Motors ------------------------------
     private DcMotor leftTopDrive;
     private DcMotor rightTopDrive;
     private DcMotor rightBotDrive;
@@ -24,6 +21,12 @@ class Robot_MecanumDrive {
     private double driveAxial = 0;
     private double driveLateral = 0;
     private double driveYaw = 0;
+
+    /* store these as motor power*/
+    private double leftTopPow = 0;
+    private double rightTopPow = 0;
+    private double rightBotPow = 0;
+    private double leftBotPow = 0;
 
     /***
      * void init(LinearOpMode opMode)
@@ -47,9 +50,7 @@ class Robot_MecanumDrive {
         myOpMode.gamepad1.setJoystickDeadzone(0.001f);
 
         //set up motor
-        String[] motorNames = {Global.LEFT_TOP_MOTOR, Global.RIGHT_TOP_MOTOR,
-                Global.RIGHT_BOT_MOTOR, Global.LEFT_BOT_MOTOR};
-        DriverController dc = new DriverController(motorNames, myOpMode.hardwareMap);
+        DriverController dc = new DriverController(myOpMode.hardwareMap);
 
         //copy data over
         leftTopDrive = dc.leftTopDrive;
@@ -110,10 +111,16 @@ class Robot_MecanumDrive {
         );
 
         //set power
-        leftTopDrive.setPower(Global.angularSpeedToMotorPower(trajectory.get(0)));
-        rightTopDrive.setPower(Global.angularSpeedToMotorPower(trajectory.get(1)));
-        rightBotDrive.setPower(Global.angularSpeedToMotorPower(trajectory.get(2)));
-        leftBotDrive.setPower(Global.angularSpeedToMotorPower(trajectory.get(3)));
+        leftTopPow = Global.angularSpeedToMotorPower(trajectory.get(0));
+        rightTopPow = Global.angularSpeedToMotorPower(trajectory.get(1));
+        rightBotPow = Global.angularSpeedToMotorPower(trajectory.get(2));
+        leftBotPow = Global.angularSpeedToMotorPower(trajectory.get(3));
+
+        //set power
+        leftTopDrive.setPower(leftTopPow);
+        rightTopDrive.setPower(rightTopPow);
+        rightBotDrive.setPower(rightBotPow);
+        leftBotDrive.setPower(leftBotPow);
 
 
         //telemetry
@@ -132,10 +139,11 @@ class Robot_MecanumDrive {
 
         myOpMode.telemetry.addData("Motors",
                 "m1: (%.2f), m2: (%.2f), m3: (%.2f),  m4: (%.2f)",
-                Global.angularSpeedToMotorPower(trajectory.get(0)),
-                Global.angularSpeedToMotorPower(trajectory.get(1)),
-                Global.angularSpeedToMotorPower(trajectory.get(2)),
-                Global.angularSpeedToMotorPower(trajectory.get(3)));
+                leftTopPow,
+                rightTopPow,
+                rightBotPow,
+                leftBotPow
+                );
 
 
         myOpMode.telemetry.addData("Encoder Values",

@@ -42,29 +42,35 @@ import com.qualcomm.robotcore.util.Range;
 public class CombinedOpMode extends LinearOpMode {
 
     Robot_MecanumDrive robot;
-    Robot_Navigation nav;
+    //Robot_Navigation nav;
+    //Robot_Arm arm;
+    //Robot_FrontHook frontHook;
 
     @Override
     public void runOpMode() throws InterruptedException{
 
         //init bot and nav
         robot = new Robot_MecanumDrive(this);
-        nav = new Robot_Navigation(this);
-
+        //nav = new Robot_Navigation(this);
+        //arm = new Robot_Arm(this);
+        //frontHook = new Robot_FrontHook(this);
 
         waitForStart();
 
         //start vuforia.
-        nav.start();
+        //nav.start();
         while(opModeIsActive()) {
             robot.doControllerTick();
             robot.moveRobot();
 
-            nav.targetsAreVisible();
+            //nav.targetsAreVisible();
 
-            //since we init robot and nav to "this" opMode, we can
-            //addDate to telemetry within the class, and flush outside
-            //using update.
+            //arm.doControllerTick();
+            //arm.moveArm();
+
+            //frontHook.doControllerTick();
+
+            //flush telemetry
             telemetry.update();
         }
 

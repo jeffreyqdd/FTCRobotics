@@ -7,6 +7,9 @@ public class Global {
     public static final String RIGHT_TOP_MOTOR = "top right drive";
     public static final String RIGHT_BOT_MOTOR = "bot right drive";
     public static final String LEFT_BOT_MOTOR = "bot left drive";
+    public static final String LIFT_MOTOR = "lift motor";
+    public static final String LEFT_FRONT_SERVO = "front left servo";
+    public static final String RIGHT_FRONT_SERVO = "front right servo";
 
     public static final double DIST_BETWEEN_FRONT_AND_FRONT = 0.405; //m
     public static final double DIST_BETWEEN_FRONT_AND_REAR = 0.202; //m
@@ -16,6 +19,9 @@ public class Global {
 
     public static final double MAX_RPM = 100; //rotations per minute
     public static final double MAX_SPEED = (MAX_RPM / 60) * WHEEL_CIRCUM; //m/s
+
+    public static final int TICKS_PER_REV = 1440;
+    public static final double[] MOTOR_POSITION = {0.1, 1, 1.5, 2.0, 2.5};
 
     /***
      * double angularSpeedToMotorPower(double angularSpeed)
