@@ -1,12 +1,13 @@
-package org.firstinspires.ftc.team17294;
+package edu.robot.ftc.team17294;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 import com.gogobot.botcore.kinematic.*;
+
 import java.util.List;
 
-class Robot_MecanumDrive {
+public class Robot_MecanumDrive {
 
     private LinearOpMode myOpMode = null;
     private FourMecanumKinematic kinematic = null;
@@ -49,6 +50,7 @@ class Robot_MecanumDrive {
         //Controller deadzone
         myOpMode.gamepad1.setJoystickDeadzone(0.001f);
 
+
         //set up motor
         DriverController dc = new DriverController(myOpMode.hardwareMap);
 
@@ -60,6 +62,16 @@ class Robot_MecanumDrive {
 
         //stop all motion.
         moveRobot(0,0,0) ;
+
+
+    }
+
+    public void tick()
+    {
+        doControllerTick();
+        moveRobot();
+
+        updateTelemetry();
     }
 
     public void doControllerTick()  {
@@ -79,7 +91,7 @@ class Robot_MecanumDrive {
         /*should be in m/s*/
         controllerAxial = Range.clip(controllerAxial, -1, 1) * Global.MAX_SPEED;
         controllerLateral = Range.clip(controllerLateral, -1, 1) * Global.MAX_SPEED;
-        controllerYaw = Range.clip(controllerYaw, -1, 1) * Global.MAX_SPEED;
+        controllerYaw = Range.clip(controllerYaw, -1, 1) * Global.MAX_ANGULAR_SPEED;
 
         setAxial(controllerAxial); //m/s
         setLateral(controllerLateral); //m/s
@@ -116,6 +128,7 @@ class Robot_MecanumDrive {
         rightBotPow = Global.angularSpeedToMotorPower(trajectory.get(2));
         leftBotPow = Global.angularSpeedToMotorPower(trajectory.get(3));
 
+
         //set power
         leftTopDrive.setPower(leftTopPow);
         rightTopDrive.setPower(rightTopPow);
@@ -123,36 +136,7 @@ class Robot_MecanumDrive {
         leftBotDrive.setPower(leftBotPow);
 
 
-        //telemetry
-        myOpMode.telemetry.addData("Inputs",
-                "Axial: (%.2f), Lateral: (%.2f), Yaw: (%.2f)",
-                driveAxial,
-                driveLateral,
-                driveYaw);
-
-        myOpMode.telemetry.addData("pre processed Motors",
-                "m1: (%.2f), m2: (%.2f), m3: (%.2f),  m4: (%.2f)",
-                trajectory.get(0),
-                trajectory.get(1),
-                trajectory.get(2),
-                trajectory.get(3));
-
-        myOpMode.telemetry.addData("Motors",
-                "m1: (%.2f), m2: (%.2f), m3: (%.2f),  m4: (%.2f)",
-                leftTopPow,
-                rightTopPow,
-                rightBotPow,
-                leftBotPow
-                );
-
-
-        myOpMode.telemetry.addData("Encoder Values",
-                "[" + leftTopDrive.getCurrentPosition() + "," +
-                rightTopDrive.getCurrentPosition() + "," +
-                rightBotDrive.getCurrentPosition() + "," +
-                leftBotDrive.getCurrentPosition() + "]");
-
-    }// beautiful
+    }
 
     /***
      * void moveRobot(double axial, double lateral, double yaw)
@@ -174,6 +158,33 @@ class Robot_MecanumDrive {
     public void setAxial(double axial) {this.driveAxial = axial;}
     public void setLateral(double lateral) {this.driveLateral = lateral;}
     public void setYaw(double yaw) {this.driveYaw = yaw;}
+
+
+    public void updateTelemetry()
+    {
+        //telemetry
+        myOpMode.telemetry.addData("Inputs",
+                "Axial: (%.2f), Lateral: (%.2f), Yaw: (%.2f)",
+                driveAxial,
+                driveLateral,
+                driveYaw);
+
+        myOpMode.telemetry.addData("Motors",
+                "m1: (%.2f), m2: (%.2f), m3: (%.2f),  m4: (%.2f)",
+                leftTopPow,
+                rightTopPow,
+                rightBotPow,
+                leftBotPow
+        );
+
+
+        myOpMode.telemetry.addData("Encoder Values",
+                "[" + leftTopDrive.getCurrentPosition() + "," +
+                        rightTopDrive.getCurrentPosition() + "," +
+                        rightBotDrive.getCurrentPosition() + "," +
+                        leftBotDrive.getCurrentPosition() + "]");
+    }
+
 
 
 }

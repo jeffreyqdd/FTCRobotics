@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.team17294;
+package edu.robot.ftc.team17294;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -15,6 +15,7 @@ public class DriverController {
 
     public Servo leftFrontServo;
     public Servo rightFrontServo;
+    public Servo frontClawServo;
 
 
     public DriverController(HardwareMap hardwareMap)
@@ -24,6 +25,8 @@ public class DriverController {
         /* do the servos */
         leftFrontServo = hardwareMap.get(Servo.class, Global.LEFT_FRONT_SERVO);
         rightFrontServo = hardwareMap.get(Servo.class, Global.RIGHT_FRONT_SERVO);
+        frontClawServo = hardwareMap.get(Servo.class, Global.FRONT_CLAW_SERVO);
+
 
         /* do the one lift motor*/
         liftMotor = hardwareMap.get(DcMotor.class, Global.LIFT_MOTOR);
@@ -65,9 +68,5 @@ public class DriverController {
         rightTopDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightBotDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         leftBotDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-
-
-
     }
 }

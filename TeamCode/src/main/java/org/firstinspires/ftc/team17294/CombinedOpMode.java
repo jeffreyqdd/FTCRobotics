@@ -29,48 +29,55 @@
 
 package org.firstinspires.ftc.team17294;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
+
+import edu.robot.ftc.team17294.*;
 
 
-@TeleOp(name="Vuforia test op mode", group="Linear Opmode")
+@TeleOp(name="Combined test op mode", group="Linear Opmode")
 //@Disabled
 public class CombinedOpMode extends LinearOpMode {
 
-    Robot_MecanumDrive robot;
-    //Robot_Navigation nav;
-    //Robot_Arm arm;
-    //Robot_FrontHook frontHook;
+    Robot_Claw rClaw;
+    Robot_FrontHook rHook;
+    Robot_Lift rLift;
+    Robot_MecanumDrive rDrive;
+    Robot_Navigation rNav;
 
     @Override
     public void runOpMode() throws InterruptedException{
 
         //init bot and nav
-        robot = new Robot_MecanumDrive(this);
-        //nav = new Robot_Navigation(this);
-        //arm = new Robot_Arm(this);
-        //frontHook = new Robot_FrontHook(this);
+        rClaw   = new Robot_Claw(this);
+        rHook   = new Robot_FrontHook(this);
+        rLift   = new Robot_Lift(this);
+        rDrive  = new Robot_MecanumDrive(this);
+        rNav    = new Robot_Navigation(this);
 
-        waitForStart();
+
+        waitForStart(); //wait until game starts
 
         //start vuforia.
-        //nav.start();
+        rNav.start();
         while(opModeIsActive()) {
-            robot.doControllerTick();
-            robot.moveRobot();
 
-            //nav.targetsAreVisible();
+            /* ROBOT CLAW CONTROL */
+            rClaw.tick();
 
-            //arm.doControllerTick();
-            //arm.moveArm();
+            /* ROBOT FRONT HOOK CONTROL */
+            rHook.tick();
 
-            //frontHook.doControllerTick();
+            /* ROBOT LIFT CONTROL */
+            rLift.tick();
 
-            //flush telemetry
+            /* ROBOT MOVEMENT */
+            rDrive.tick();
+
+            /* ROBOT VISION */
+            rNav.tick();
+
+            /* flush telemetry */
             telemetry.update();
         }
 

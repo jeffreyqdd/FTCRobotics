@@ -34,7 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.sql.Driver;
+import edu.robot.ftc.team17294.DriverController;
 
 
 @TeleOp(name="Testing Op Mode", group="Linear Opmode")
@@ -56,10 +56,7 @@ public class TestingOP extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException{
 
-        String[] motorNames = {Global.LEFT_TOP_MOTOR, Global.RIGHT_TOP_MOTOR,
-                Global.RIGHT_BOT_MOTOR, Global.LEFT_BOT_MOTOR};
-
-        DriverController dc = new DriverController(motorNames, hardwareMap);
+        DriverController dc = new DriverController(hardwareMap);
 
         leftTopDrive = dc.leftTopDrive;
         rightTopDrive = dc.rightTopDrive;

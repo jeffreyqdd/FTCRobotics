@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.team17294;
+package edu.robot.ftc.team17294;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -27,6 +27,20 @@ public class Robot_FrontHook {
         leftFrontServo.setPosition(minVal);
     }
 
+    public void tick()
+    {
+        doControllerTick();
+        updateTelemetry();
+    }
+
+
+    public void doControllerTick()
+    {
+        if(myOpMode.gamepad1.right_bumper) toggleOn();
+        if(myOpMode.gamepad1.left_bumper) toggleOff();
+    }
+
+
     public void toggleOn()
     {
         rightFrontServo.setPosition(maxVal);
@@ -39,12 +53,12 @@ public class Robot_FrontHook {
         leftFrontServo.setPosition(minVal);
     }
 
-    public void doControllerTick()
+    public void updateTelemetry()
     {
-        if(myOpMode.gamepad1.right_bumper) toggleOn();
-        if(myOpMode.gamepad2.left_bumper) toggleOff();
+        myOpMode.telemetry.addData("Front Hook Servo Positions: ",
+                "s1: (%.2f), s2: (%.2f)",
+                leftFrontServo.getPosition(),
+                rightFrontServo.getPosition());
     }
-
-
 
 }
