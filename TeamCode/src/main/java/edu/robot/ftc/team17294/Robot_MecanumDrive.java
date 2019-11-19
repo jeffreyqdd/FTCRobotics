@@ -81,12 +81,13 @@ public class Robot_MecanumDrive {
         //triggers are scaled down for fine movements
         //sticks are linear curved while the sticks are exponential
 
-        double controllerAxial = -myOpMode.gamepad1.left_stick_y;
-        double controllerLateral = myOpMode.gamepad1.left_stick_x
+        double controllerAxial = -myOpMode.gamepad1.left_stick_y * 0.5;
+        double controllerLateral = (myOpMode.gamepad1.left_stick_x
                                          + (myOpMode.gamepad1.left_trigger * -0.3)
-                                         + (myOpMode.gamepad1.right_trigger * 0.3);
+                                         + (myOpMode.gamepad1.right_trigger * 0.3))
+                                            * 0.5;
 
-        double controllerYaw = myOpMode.gamepad1.right_stick_x;
+        double controllerYaw = myOpMode.gamepad1.right_stick_x * 0.3;
 
         /*should be in m/s*/
         controllerAxial = Range.clip(controllerAxial, -1, 1) * Global.MAX_SPEED;
@@ -134,6 +135,8 @@ public class Robot_MecanumDrive {
         rightTopDrive.setPower(rightTopPow);
         rightBotDrive.setPower(rightBotPow);
         leftBotDrive.setPower(leftBotPow);
+
+        myOpMode.telemetry.addData("this is a test: ", leftTopPow);
 
 
     }

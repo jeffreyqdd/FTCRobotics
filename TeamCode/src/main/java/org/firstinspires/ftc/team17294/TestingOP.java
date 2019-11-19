@@ -75,8 +75,8 @@ public class TestingOP extends LinearOpMode {
         {
 
             //get inputs
-            if(gamepad1.right_bumper) speedToggle = 0.75;
-            if(gamepad1.left_bumper) speedToggle = -0.75;
+            if(gamepad1.right_bumper) speedToggle = 0.20;
+            if(gamepad1.left_bumper) speedToggle = -0.25;
 
             if(gamepad1.y) toggle1 = !toggle1;
             if(gamepad1.b) toggle2 = !toggle2;

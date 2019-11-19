@@ -5,8 +5,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Robot_FrontHook {
 
-    private double minVal = 0;
-    private double maxVal = 1;
+    private double minValRight = 0;
+    private double minValLeft = 0.75;
+
+    private double maxValRight = 0.75;
+    private double maxValLeft = 0;
 
     private Servo rightFrontServo;
     private Servo leftFrontServo;
@@ -23,8 +26,8 @@ public class Robot_FrontHook {
         rightFrontServo = dc.rightFrontServo;
         leftFrontServo = dc.leftFrontServo;
 
-        rightFrontServo.setPosition(minVal);
-        leftFrontServo.setPosition(minVal);
+        rightFrontServo.setPosition(minValRight);
+        leftFrontServo.setPosition(minValLeft);
     }
 
     public void tick()
@@ -43,14 +46,14 @@ public class Robot_FrontHook {
 
     public void toggleOn()
     {
-        rightFrontServo.setPosition(maxVal);
-        leftFrontServo.setPosition(maxVal);
+        rightFrontServo.setPosition(maxValRight);
+        leftFrontServo.setPosition(maxValLeft);
     }
 
     public void toggleOff()
     {
-        rightFrontServo.setPosition(minVal);
-        leftFrontServo.setPosition(minVal);
+        rightFrontServo.setPosition(minValRight);
+        leftFrontServo.setPosition(minValLeft);
     }
 
     public void updateTelemetry()

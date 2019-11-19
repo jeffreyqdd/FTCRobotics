@@ -37,45 +37,52 @@ import edu.robot.ftc.team17294.*;
 
 @TeleOp(name="Combined test op mode", group="Linear Opmode")
 //@Disabled
-public class CombinedOpMode extends LinearOpMode {
+public class CombinedOpModeTest extends LinearOpMode {
 
-    Robot_Claw rClaw;
+    //Robot_Claw rClaw;
     Robot_FrontHook rHook;
-    Robot_Lift rLift;
+    //Robot_Lift rLift;
     Robot_MecanumDrive rDrive;
-    Robot_Navigation rNav;
+    //Robot_Navigation rNav;
+    Robot_SensorDistance rDistance;
 
     @Override
     public void runOpMode() throws InterruptedException{
 
         //init bot and nav
-        rClaw   = new Robot_Claw(this);
+        //rClaw   = new Robot_Claw(this);
         rHook   = new Robot_FrontHook(this);
-        rLift   = new Robot_Lift(this);
+        //rLift   = new Robot_Lift(this);
         rDrive  = new Robot_MecanumDrive(this);
-        rNav    = new Robot_Navigation(this);
+        //rNav    = new Robot_Navigation(this);
 
+
+        rDistance = new Robot_SensorDistance(this);
 
         waitForStart(); //wait until game starts
 
         //start vuforia.
-        rNav.start();
+        //rNav.start();
         while(opModeIsActive()) {
 
             /* ROBOT CLAW CONTROL */
-            rClaw.tick();
+            //rClaw.tick();
 
             /* ROBOT FRONT HOOK CONTROL */
             rHook.tick();
 
             /* ROBOT LIFT CONTROL */
-            rLift.tick();
+            //rLift.tick();
 
             /* ROBOT MOVEMENT */
             rDrive.tick();
 
             /* ROBOT VISION */
-            rNav.tick();
+            //rNav.tick();
+
+            /* ROBOT DISTANCE */
+            rDistance.tick();
+
 
             /* flush telemetry */
             telemetry.update();
