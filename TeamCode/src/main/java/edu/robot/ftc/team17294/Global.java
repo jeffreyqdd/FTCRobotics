@@ -25,10 +25,12 @@ public class Global {
     public static final double MAX_RPM = 300; //rotations per minute
     public static final double MAX_SPEED = (MAX_RPM / 60) * WHEEL_CIRCUM; //m/s
     public static final double MAX_ANGULAR_SPEED = MAX_SPEED * 3.33;
-    public static final double PLAYER_TRIM = 0.70;
-    public static final int TICKS_PER_REV = 1440;
-    public static final int[] MOTOR_POSITION = {0, 100, 2000, 4000, 6000, 8000};
+    public static final int[] MOTOR_POSITION = {0, 100, 1100, 2100, 3100, 4100};
 
+    public static final double PROPORTION = 0.5;
+    public static final double INTEGRAL = 0.0;
+    public static final double DERIVATIVE = 0.0;
+    public static final double DIST_FROM_WAFFLE = 33;
     /***
      * double angularSpeedToMotorPower(double angularSpeed)
      * @param angularSpeed, radians per second

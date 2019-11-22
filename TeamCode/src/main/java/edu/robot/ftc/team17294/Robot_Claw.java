@@ -14,11 +14,9 @@ public class Robot_Claw{
     private double maxPos = 0.75;
 
 
-    public Robot_Claw(LinearOpMode opMode){
+    public Robot_Claw(LinearOpMode opMode, DriverController dc){
         myOpMode = opMode;
 
-
-        DriverController dc = new DriverController(myOpMode.hardwareMap);
         clawServo = dc.frontClawServo;
 
         aButton = false;

@@ -3,6 +3,8 @@ package edu.robot.ftc.team17294;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import java.sql.Driver;
+
 public class Robot_FrontHook {
 
     private double minValRight = 0;
@@ -17,11 +19,9 @@ public class Robot_FrontHook {
 
     private LinearOpMode myOpMode;
 
-    public Robot_FrontHook(LinearOpMode opMode)
+    public Robot_FrontHook(LinearOpMode opMode, DriverController dc)
     {
         myOpMode = opMode;
-
-        DriverController dc = new DriverController(myOpMode.hardwareMap);
 
         rightFrontServo = dc.rightFrontServo;
         leftFrontServo = dc.leftFrontServo;

@@ -44,20 +44,19 @@ public class CombinedOpModeTest extends LinearOpMode {
     //Robot_Lift rLift;
     Robot_MecanumDrive rDrive;
     //Robot_Navigation rNav;
-    Robot_SensorDistance rDistance;
 
     @Override
     public void runOpMode() throws InterruptedException{
 
+        DriverController dc = new DriverController(hardwareMap);
+
         //init bot and nav
         //rClaw   = new Robot_Claw(this);
-        rHook   = new Robot_FrontHook(this);
+        rHook   = new Robot_FrontHook(this, dc);
         //rLift   = new Robot_Lift(this);
-        rDrive  = new Robot_MecanumDrive(this);
+        rDrive  = new Robot_MecanumDrive(this, dc);
         //rNav    = new Robot_Navigation(this);
 
-
-        rDistance = new Robot_SensorDistance(this);
 
         waitForStart(); //wait until game starts
 
@@ -79,9 +78,6 @@ public class CombinedOpModeTest extends LinearOpMode {
 
             /* ROBOT VISION */
             //rNav.tick();
-
-            /* ROBOT DISTANCE */
-            rDistance.tick();
 
 
             /* flush telemetry */

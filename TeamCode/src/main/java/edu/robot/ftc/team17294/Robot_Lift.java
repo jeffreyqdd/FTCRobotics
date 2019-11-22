@@ -17,13 +17,12 @@ public class Robot_Lift {
 
     private float power;
 
-    public Robot_Lift(LinearOpMode opMode)
+    public Robot_Lift(LinearOpMode opMode, DriverController dc)
     {
         //store opMode
         myOpMode = opMode;
 
         //init lift motor
-        DriverController dc = new DriverController(myOpMode.hardwareMap);
         liftMotor = dc.liftMotor;
 
         //Controller deadzone
@@ -74,10 +73,11 @@ public class Robot_Lift {
             rightBumperDown = false;
 
         /*only for emergencies*/
-        if(myOpMode.gamepad1.dpad_down)
+        if(myOpMode.gamepad1.dpad_down) {
             liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        power = -myOpMode.gamepad2.left_stick_y;
+            liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+        power = -myOpMode.gamepad2.left_stick_y * 0.1f;
 
     }
     public void tuneArm()

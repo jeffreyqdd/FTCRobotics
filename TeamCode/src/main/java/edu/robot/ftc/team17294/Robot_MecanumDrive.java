@@ -2,15 +2,19 @@ package edu.robot.ftc.team17294;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 import com.gogobot.botcore.kinematic.*;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.List;
 
 public class Robot_MecanumDrive {
 
-    private LinearOpMode myOpMode = null;
-    private FourMecanumKinematic kinematic = null;
+    private LinearOpMode myOpMode;
+    private FourMecanumKinematic kinematic;
 
     //Dc Motors ------------------------------
     private DcMotor leftTopDrive;
@@ -29,12 +33,18 @@ public class Robot_MecanumDrive {
     private double rightBotPow = 0;
     private double leftBotPow = 0;
 
+
+    /*Self correction*/
+    private AutomaticAlign auto;
+
+    private boolean autoIsEngaged = false;
+
     /***
      * void init(LinearOpMode opMode)
      * initializes all the members and data needed to operate the motors
      * @param opMode stores a copy of the current opMode to access members ex: game pad
      */
-    public Robot_MecanumDrive(LinearOpMode opMode)
+    public Robot_MecanumDrive(LinearOpMode opMode, DriverController dc)
     {
 
         //save reference to Hardware map
@@ -51,14 +61,14 @@ public class Robot_MecanumDrive {
         myOpMode.gamepad1.setJoystickDeadzone(0.001f);
 
 
-        //set up motor
-        DriverController dc = new DriverController(myOpMode.hardwareMap);
-
         //copy data over
         leftTopDrive = dc.leftTopDrive;
         rightTopDrive = dc.rightTopDrive;
         rightBotDrive = dc.rightBotDrive;
         leftBotDrive = dc.leftBotDrive;
+
+        //create autonomous assisted inner class
+        auto = new AutomaticAlign(opMode, dc, kinematic);
 
         //stop all motion.
         moveRobot(0,0,0) ;
@@ -69,6 +79,7 @@ public class Robot_MecanumDrive {
     public void tick()
     {
         doControllerTick();
+
         moveRobot();
 
         updateTelemetry();
@@ -81,13 +92,19 @@ public class Robot_MecanumDrive {
         //triggers are scaled down for fine movements
         //sticks are linear curved while the sticks are exponential
 
-        double controllerAxial = -myOpMode.gamepad1.left_stick_y * 0.5;
+        double controllerAxial = -myOpMode.gamepad1.left_stick_y;
         double controllerLateral = (myOpMode.gamepad1.left_stick_x
                                          + (myOpMode.gamepad1.left_trigger * -0.3)
-                                         + (myOpMode.gamepad1.right_trigger * 0.3))
-                                            * 0.5;
+                                         + (myOpMode.gamepad1.right_trigger * 0.3));
 
-        double controllerYaw = myOpMode.gamepad1.right_stick_x * 0.3;
+        double controllerYaw = myOpMode.gamepad1.right_stick_x;
+
+        autoIsEngaged = myOpMode.gamepad1.b;
+
+        //downscale the speeds
+        controllerAxial *= 0.5;
+        controllerLateral *= 0.5;
+        controllerYaw *= 0.5;
 
         /*should be in m/s*/
         controllerAxial = Range.clip(controllerAxial, -1, 1) * Global.MAX_SPEED;
@@ -129,6 +146,15 @@ public class Robot_MecanumDrive {
         rightBotPow = Global.angularSpeedToMotorPower(trajectory.get(2));
         leftBotPow = Global.angularSpeedToMotorPower(trajectory.get(3));
 
+        if(autoIsEngaged)
+        {
+            List<Double> autoTrajectory = auto.doCorrection();
+
+            leftTopPow += Global.angularSpeedToMotorPower(autoTrajectory.get(0));
+            rightTopPow += Global.angularSpeedToMotorPower(autoTrajectory.get(1));
+            rightBotPow += Global.angularSpeedToMotorPower(autoTrajectory.get(2));
+            leftBotPow += Global.angularSpeedToMotorPower(autoTrajectory.get(3));
+        }
 
         //set power
         leftTopDrive.setPower(leftTopPow);
@@ -136,7 +162,7 @@ public class Robot_MecanumDrive {
         rightBotDrive.setPower(rightBotPow);
         leftBotDrive.setPower(leftBotPow);
 
-        myOpMode.telemetry.addData("this is a test: ", leftTopPow);
+        //myOpMode.telemetry.addData("this is a test: ", leftTopPow);
 
 
     }
@@ -189,6 +215,66 @@ public class Robot_MecanumDrive {
     }
 
 
+    private class AutomaticAlign
+    {
+        private DistanceSensor leftWaffleSensor;
+        private DistanceSensor rightWaffleSensor;
+        private LinearOpMode myOpMode;
+
+        //PID controller
+        Robot_PIDController PIDLeft;
+        Robot_PIDController PIDRight;
+
+
+        private double leftWaffleDist = 0.0;
+        private double rightWaffleDist = 0.0;
+        private FourMecanumKinematic kinematic;
+
+        public AutomaticAlign(LinearOpMode opMode, DriverController dc, FourMecanumKinematic kinematic)
+        {
+            this.myOpMode = opMode;
+            this.kinematic = kinematic;
+
+            //init PID values;
+            PIDLeft =  new Robot_PIDController(Global.DIST_FROM_WAFFLE,Global.PROPORTION, Global.INTEGRAL, Global.DERIVATIVE);
+            PIDRight = new Robot_PIDController(Global.DIST_FROM_WAFFLE,Global.PROPORTION, Global.INTEGRAL, Global.DERIVATIVE);
+
+            //copy sensor references
+            leftWaffleSensor = dc.leftWaffleSensor;
+            rightWaffleSensor = dc.rightWaffleSensor;
+        }
+
+
+        public List<Double> doCorrection()
+        {
+            leftWaffleDist = leftWaffleSensor.getDistance(DistanceUnit.MM);
+            rightWaffleDist = rightWaffleSensor.getDistance(DistanceUnit.MM);
+
+            double leftChange = PIDLeft.update(System.currentTimeMillis(), leftWaffleDist);
+            double rightChange = PIDRight.update(System.currentTimeMillis(), rightWaffleDist);
+
+
+            double dampenedAxial = (rightChange + leftChange) * 0.5 * 0.001;
+            double dampenedLateral = 0;
+            double dampenedYaw = (rightChange - leftChange) * 0.001;
+
+            List<Double> trajectory = this.kinematic.cartesianVelocityToWheelVelocities(
+                    new CartesianVelocity(dampenedAxial, dampenedLateral, dampenedYaw)
+            );
+
+            addTelemetry();
+
+            return trajectory;
+        }
+
+
+        public void addTelemetry()
+        {
+            this.myOpMode.telemetry.addData("left value:", leftWaffleDist);
+            this.myOpMode.telemetry.addData("right value:", rightWaffleDist);
+        }
+
+    }
 
 }
 
