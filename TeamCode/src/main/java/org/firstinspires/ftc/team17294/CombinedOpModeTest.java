@@ -39,11 +39,13 @@ import edu.robot.ftc.team17294.*;
 //@Disabled
 public class CombinedOpModeTest extends LinearOpMode {
 
-    //Robot_Claw rClaw;
+    Robot_Claw rClaw;
     Robot_FrontHook rHook;
-    //Robot_Lift rLift;
+    Robot_Lift rLift;
     Robot_MecanumDrive rDrive;
-    //Robot_Navigation rNav;
+    Robot_Navigation rNav;
+
+    long timeElapsed = 0;
 
     @Override
     public void runOpMode() throws InterruptedException{
@@ -51,9 +53,9 @@ public class CombinedOpModeTest extends LinearOpMode {
         DriverController dc = new DriverController(hardwareMap);
 
         //init bot and nav
-        //rClaw   = new Robot_Claw(this);
-        rHook   = new Robot_FrontHook(this, dc);
-        //rLift   = new Robot_Lift(this);
+        rClaw   = new Robot_Claw(this, dc);
+        //rHook   = new Robot_FrontHook(this, dc);
+        rLift   = new Robot_Lift(this, dc);
         rDrive  = new Robot_MecanumDrive(this, dc);
         //rNav    = new Robot_Navigation(this);
 
@@ -68,7 +70,7 @@ public class CombinedOpModeTest extends LinearOpMode {
             //rClaw.tick();
 
             /* ROBOT FRONT HOOK CONTROL */
-            rHook.tick();
+            //rHook.tick();
 
             /* ROBOT LIFT CONTROL */
             //rLift.tick();
@@ -79,6 +81,8 @@ public class CombinedOpModeTest extends LinearOpMode {
             /* ROBOT VISION */
             //rNav.tick();
 
+            telemetry.addData("Loop ms:  ", System.currentTimeMillis() - timeElapsed);
+            timeElapsed = System.currentTimeMillis();
 
             /* flush telemetry */
             telemetry.update();

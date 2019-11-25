@@ -5,22 +5,20 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Robot_Claw{
     private LinearOpMode myOpMode;
-    private Servo clawServo;
+    private Servo leftServo;
+    private Servo rightServo;
 
-    private boolean aButton;
-    private boolean bButton;
-
-    private double minPos = 0;
-    private double maxPos = 0.75;
 
 
     public Robot_Claw(LinearOpMode opMode, DriverController dc){
         myOpMode = opMode;
 
-        clawServo = dc.frontClawServo;
+        leftServo = dc.frontLeftClawServo;
+        rightServo = dc.frontRightClawServo;
 
-        aButton = false;
-        bButton = false;
+        leftServo.setPosition(0.5);
+        rightServo.setPosition(0.5);
+
     }
 
     public void tick()
@@ -33,34 +31,31 @@ public class Robot_Claw{
 
     public void doControllerTick()
     {
-        if(myOpMode.gamepad2.a && !aButton){
+        if(myOpMode.gamepad2.a){
             moveToGrip();
-            aButton = true;
         }
-        if(myOpMode.gamepad2.b && !bButton){
+        if(myOpMode.gamepad2.b){
             moveToRelease();
-            bButton = true;
         }
 
-        if(!myOpMode.gamepad2.a)
-            aButton = false;
-        if(!myOpMode.gamepad2.b)
-            bButton = false;
     }
 
 
     public void moveToGrip() {
-        clawServo.setPosition(maxPos);
+
+        leftServo.setPosition(0.75);
+        rightServo.setPosition(0.8);
     }
 
     public void moveToRelease() {
-        clawServo.setPosition(minPos);
+
+        leftServo.setPosition(0.2);
+        rightServo.setPosition(0.23);
     }
 
     public void updateTelemetry()
     {
-        myOpMode.telemetry.addData("Claw Servo Position: ",
-                "s1: (%.2f)", clawServo.getPosition());
+        myOpMode.telemetry.addData("Claw Servo Position: ", leftServo.getPosition() + "," +  rightServo.getPosition());
     }
 
 }

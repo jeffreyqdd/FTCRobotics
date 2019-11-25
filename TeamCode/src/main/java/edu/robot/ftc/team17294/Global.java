@@ -11,7 +11,9 @@ public class Global {
 
     public static final String LEFT_FRONT_SERVO = "front left servo";
     public static final String RIGHT_FRONT_SERVO = "front right servo";
-    public static final String FRONT_CLAW_SERVO = "front claw servo";
+
+    public static final String FRONT_LEFT_CLAW_SERVO = "left claw servo";
+    public static final String FRONT_RIGHT_CLAW_SERVO = "right claw servo";
 
     public static final String FRONT_LEFT_WAFFLE_SENSOR = "left waffle sensor";
     public static final String FRONT_RIGHT_WAFFLE_SENSOR = "right waffle sensor";
@@ -25,7 +27,7 @@ public class Global {
     public static final double MAX_RPM = 300; //rotations per minute
     public static final double MAX_SPEED = (MAX_RPM / 60) * WHEEL_CIRCUM; //m/s
     public static final double MAX_ANGULAR_SPEED = MAX_SPEED * 3.33;
-    public static final int[] MOTOR_POSITION = {0, 100, 1100, 2100, 3100, 4100};
+    public static final int[] MOTOR_POSITION = {0, 50, 350, 650, 950, 1100};
 
     public static final double PROPORTION = 0.5;
     public static final double INTEGRAL = 0.0;

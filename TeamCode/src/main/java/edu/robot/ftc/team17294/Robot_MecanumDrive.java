@@ -58,7 +58,7 @@ public class Robot_MecanumDrive {
         kinematic = new FourMecanumKinematic(config);
 
         //Controller deadzone
-        myOpMode.gamepad1.setJoystickDeadzone(0.001f);
+        //myOpMode.gamepad1.setJoystickDeadzone(0.001f);
 
 
         //copy data over
@@ -104,7 +104,7 @@ public class Robot_MecanumDrive {
         //downscale the speeds
         controllerAxial *= 0.5;
         controllerLateral *= 0.5;
-        controllerYaw *= 0.5;
+        controllerYaw *= 0.3;
 
         /*should be in m/s*/
         controllerAxial = Range.clip(controllerAxial, -1, 1) * Global.MAX_SPEED;
@@ -145,6 +145,8 @@ public class Robot_MecanumDrive {
         rightTopPow = Global.angularSpeedToMotorPower(trajectory.get(1));
         rightBotPow = Global.angularSpeedToMotorPower(trajectory.get(2));
         leftBotPow = Global.angularSpeedToMotorPower(trajectory.get(3));
+
+        //auto.doCorrection();
 
         if(autoIsEngaged)
         {

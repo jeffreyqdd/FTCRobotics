@@ -17,7 +17,9 @@ public class DriverController {
 
     public Servo leftFrontServo;
     public Servo rightFrontServo;
-    public Servo frontClawServo;
+    public Servo frontLeftClawServo;
+    public Servo frontRightClawServo;
+
 
 
     public DistanceSensor leftWaffleSensor;
@@ -35,7 +37,13 @@ public class DriverController {
         /* do the servos */
         leftFrontServo = hardwareMap.get(Servo.class, Global.LEFT_FRONT_SERVO);
         rightFrontServo = hardwareMap.get(Servo.class, Global.RIGHT_FRONT_SERVO);
-        //frontClawServo = hardwareMap.get(Servo.class, Global.FRONT_CLAW_SERVO);
+
+        frontLeftClawServo = hardwareMap.get(Servo.class, Global.FRONT_LEFT_CLAW_SERVO);
+        frontRightClawServo = hardwareMap.get(Servo.class, Global.FRONT_RIGHT_CLAW_SERVO);
+
+        frontLeftClawServo.setDirection(Servo.Direction.FORWARD);
+        frontRightClawServo.setDirection(Servo.Direction.REVERSE);
+
 
 
         /* do the one lift motor*/

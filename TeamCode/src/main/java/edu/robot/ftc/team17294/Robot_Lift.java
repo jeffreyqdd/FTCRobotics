@@ -2,6 +2,7 @@ package edu.robot.ftc.team17294;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
 
@@ -11,11 +12,15 @@ public class Robot_Lift {
 
 
     private int level;
+    private int desiredEncoderValue;
+    private double power;
     private boolean leftBumperDown;
     private boolean rightBumperDown;
-    private boolean isBusy;
 
-    private float power;
+    /* constants */
+    private static final double MIN_ERROR = 50;
+    private static final double MAX_UP_POWER = 1.0;
+    private static final double MAX_DOWN_POWER= -0.3;
 
     public Robot_Lift(LinearOpMode opMode, DriverController dc)
     {
@@ -23,7 +28,7 @@ public class Robot_Lift {
         myOpMode = opMode;
 
         //init lift motor
-        liftMotor = dc.liftMotor;
+        liftMotor = dc.leftTopDrive;
 
         //Controller deadzone
         myOpMode.gamepad2.setJoystickDeadzone(0.001f);
@@ -34,17 +39,17 @@ public class Robot_Lift {
         rightBumperDown = false;
 
         level = 0;
-        power = 0;
-        isBusy = false;
+        desiredEncoderValue = 0;
 
+        power = 0.0;
     }
 
     public void tick()
     {
         doControllerTick();
 
-        tuneArm();
         moveArm();
+
 
         updateTelemetry();
     }
@@ -56,7 +61,7 @@ public class Robot_Lift {
             leftBumperDown = true;
             level = Range.clip(level - 1, 0, 5);
 
-            isBusy = true;
+            desiredEncoderValue = Global.MOTOR_POSITION[level];
         }
 
         if(myOpMode.gamepad2.right_bumper && !rightBumperDown)
@@ -64,7 +69,7 @@ public class Robot_Lift {
             rightBumperDown = true;
             level = Range.clip(level + 1, 0, 5);
 
-            isBusy = true;
+            desiredEncoderValue = Global.MOTOR_POSITION[level];
         }
 
         if(!myOpMode.gamepad2.left_bumper)
@@ -72,31 +77,40 @@ public class Robot_Lift {
         if(!myOpMode.gamepad2.right_bumper)
             rightBumperDown = false;
 
-        /*only for emergencies*/
-        if(myOpMode.gamepad1.dpad_down) {
-            liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        }
-        power = -myOpMode.gamepad2.left_stick_y * 0.1f;
 
-    }
-    public void tuneArm()
-    {
-        liftMotor.setPower(power);
+
     }
 
 
     public void moveArm()
     {
-        //only set target if something has changed.
-        if(isBusy == false) return;
-        isBusy = false;
+        /*double error = desiredEncoderValue - liftMotor.getCurrentPosition();
 
-        liftMotor.setTargetPosition(Global.MOTOR_POSITION[level]);
+        if(Math.abs(error) > MIN_ERROR)
+        {
+            power = Range.clip(error * 0.001, MAX_DOWN_POWER, MAX_UP_POWER);
+        }
+        else
+        {
+            power = 0;
+        }
+        myOpMode.telemetry.addData("Move","Error: " + error + " Power: "+ power);
+        liftMotor.setPower(power);
+        */
+
+        double test = -myOpMode.gamepad2.left_stick_y;
+        test = Range.clip(test, -0.1, 0.7);
+
+
+        liftMotor.setPower(test);
     }
 
     public void updateTelemetry()
     {
+        myOpMode.telemetry.addData("Lift inputs: ", "Left bumper down: " + leftBumperDown
+                                    + " RIght bumper down: " + rightBumperDown + " level: " + level + ": ->"+  Global.MOTOR_POSITION[level]);
+
+
         myOpMode.telemetry.addData("Lift position:", liftMotor.getCurrentPosition());
         myOpMode.telemetry.addData("Lift level:", liftMotor.getCurrentPosition());
     }
